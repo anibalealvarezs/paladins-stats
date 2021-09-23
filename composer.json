@@ -1,0 +1,57 @@
+{
+    "name": "anibalealvarezs/paladins-stats",
+    "description": "Paladins Statistics",
+    "keywords": [
+        "project",
+        "laravel",
+        "gaming",
+        "statistics",
+        "paladins"
+    ],
+    "homepage": "https://anibalalvarez.com",
+    "license": "MIT",
+    "version" : "1.2.0",
+    "type" : "package",
+    "authors": [
+        {
+            "name": "Aníbal Álvarez",
+            "email": "anibalealvarezs@gmail.com",
+            "homepage": "https://anibalalvarez.com",
+            "role": "Developer"
+        }
+    ],
+    "require": {
+        "anibalealvarezs/projectbuilder-package": "1.2.3"
+    },
+    "autoload": {
+        "psr-4": {
+            "Anibalealvarezs\\Paladins\\": "src"
+        }
+    },
+    "repositories": [
+        {
+            "type": "composer",
+            "url": "https://satis.anibalalvarez.com"
+        }
+    ],
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Anibalealvarezs\\Paladins\\Providers\\PsAppServiceProvider",
+                "Anibalealvarezs\\Paladins\\Providers\\PsComposerServiceProvider",
+                "Anibalealvarezs\\Paladins\\Providers\\PsConfigServiceProvider",
+                "Anibalealvarezs\\Paladins\\Providers\\PsControllerServiceProvider",
+                "Anibalealvarezs\\Paladins\\Providers\\PsMiddlewareServiceProvider",
+                "Anibalealvarezs\\Paladins\\Providers\\PsMigrationServiceProvider",
+                "Anibalealvarezs\\Paladins\\Providers\\PsRouteServiceProvider",
+                "Anibalealvarezs\\Paladins\\Providers\\PsViewServiceProvider",
+                "Anibalealvarezs\\Paladins\\Providers\\PsSeederServiceProvider"
+            ]
+        }
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
+}
