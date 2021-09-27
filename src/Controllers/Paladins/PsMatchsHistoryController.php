@@ -8,12 +8,12 @@ use Illuminate\Http\Request;
 
 use Auth;
 
-class PsPaladinsController extends PsBuilderController
+class PsMatchsHistoryController extends PsBuilderController
 {
     function __construct($crud_perms = false)
     {
         // Vars Override
-        $this->key = 'Paladins';
+        $this->key = 'MatchsHistory';
         // Validation Rules
         $this->validationRules = [
             'name' => ['max:128'],

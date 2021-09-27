@@ -28,6 +28,6 @@ class PsControllerServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        $this->app->make(PbHelpers::PB_VENDOR.'\\'.PsHelpers::DM_PACKAGE.'\Controllers\Paladins\\'.PsHelpers::DM_PREFIX.'PaladinsController');
+        $this->app->make(PbHelpers::PB_VENDOR.'\\'.PsHelpers::DM_PACKAGE.'\Controllers\Paladins\\'.PsHelpers::DM_PREFIX.'MatchsHistoryController');
     }
 }

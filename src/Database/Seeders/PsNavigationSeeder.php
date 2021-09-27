@@ -17,7 +17,7 @@ class PsNavigationSeeder extends Seeder
     public function run()
     {
         // Get Permissions
-        $readPaladinsPermission = PbPermission::where('name', 'read items')->first();
+        $readPaladinsPermission = PbPermission::where('name', 'read paladins')->first();
         $modulePaladins = PbModule::where('modulekey', 'paladins')->first();
 
         // Parents
