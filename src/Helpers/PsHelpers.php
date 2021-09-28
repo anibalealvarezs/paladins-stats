@@ -43,7 +43,9 @@ class PsHelpers extends PbHelpers
                         $passives = PsPassive::with(
                             'champion', 'players', 'matchPlayers'
                         )->get()->toArray();
-                        print("<pre>".print_r($passives,true)."</pre>");
+                        // print("<pre>".print_r($passives,true)."</pre>");
+                        header('Content-Type: application/json; charset=utf-8');
+                        echo json_encode($passives, JSON_PRETTY_PRINT);
                     }
                     break;
                 case 'getChampions':
@@ -53,7 +55,9 @@ class PsHelpers extends PbHelpers
                         $champions = PsChampion::with(
                             'passives','abilities', 'talents', 'championRanks', 'loadouts', 'matches'
                         )->get()->toArray();
-                        print("<pre>".print_r($champions,true)."</pre>");
+                        // print("<pre>".print_r($champions,true)."</pre>");
+                        header('Content-Type: application/json; charset=utf-8');
+                        echo json_encode($champions, JSON_PRETTY_PRINT);
                     }
                     break;
                 case 'getPlayerMatchHistory':
@@ -63,7 +67,9 @@ class PsHelpers extends PbHelpers
                         $matchPlayer = PsMatchPlayer::where('player_id', $var1)->with(
                             'player','champion', 'match', 'talents', 'passives'
                         )->get()->toArray();
-                        print("<pre>".print_r($matchPlayer,true)."</pre>");
+                        // print("<pre>".print_r($matchPlayer,true)."</pre>");
+                        header('Content-Type: application/json; charset=utf-8');
+                        echo json_encode($matchPlayer, JSON_PRETTY_PRINT);
                     }
                     break;
                 case 'getPlayer':
@@ -73,7 +79,9 @@ class PsHelpers extends PbHelpers
                         $player = PsPlayer::where('id', $var1)->with(
                             'passives','talents', 'rankeds', 'matchPlayers', 'championRanks', 'loadouts', 'matches'
                         )->get()->toArray();
-                        print("<pre>".print_r($player,true)."</pre>");
+                        // print("<pre>".print_r($player,true)."</pre>");
+                        header('Content-Type: application/json; charset=utf-8');
+                        echo json_encode($player, JSON_PRETTY_PRINT);
                     }
                     break;
                 case 'getPlayerBatch':
@@ -84,7 +92,9 @@ class PsHelpers extends PbHelpers
                         $players = PsPlayer::whereIn('id', $array)->with(
                             'passives','talents', 'rankeds', 'matchPlayers', 'championRanks', 'loadouts', 'matches'
                         )->get()->toArray();
-                        print("<pre>".print_r($players,true)."</pre>");
+                        // print("<pre>".print_r($players,true)."</pre>");
+                        header('Content-Type: application/json; charset=utf-8');
+                        echo json_encode($players, JSON_PRETTY_PRINT);
                     }
                     break;
                 case 'getChampionRanks':
@@ -94,7 +104,9 @@ class PsHelpers extends PbHelpers
                         $ranks = PsChampionRank::where('player_id', $var1)->with(
                             'champion','player'
                         )->get()->toArray();
-                        print("<pre>".print_r($ranks,true)."</pre>");
+                        // print("<pre>".print_r($ranks,true)."</pre>");
+                        header('Content-Type: application/json; charset=utf-8');
+                        echo json_encode($ranks, JSON_PRETTY_PRINT);
                     }
                     break;
                 case 'getPlayerLoadouts':
@@ -104,7 +116,9 @@ class PsHelpers extends PbHelpers
                         $loadouts = PsLoadout::where('player_id', $var1)->with(
                             'champion','player', 'passives'
                         )->get()->toArray();
-                        print("<pre>".print_r($loadouts,true)."</pre>");
+                        // print("<pre>".print_r($loadouts,true)."</pre>");
+                        header('Content-Type: application/json; charset=utf-8');
+                        echo json_encode($loadouts, JSON_PRETTY_PRINT);
                     }
                     break;
                 default:
