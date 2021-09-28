@@ -13,7 +13,7 @@ class PsMatchsHistoryController extends PsBuilderController
     function __construct($crud_perms = false)
     {
         // Vars Override
-        $this->key = 'MatchsHistory';
+        $this->key = 'MatchPlayer';
         // Validation Rules
         $this->validationRules = [
             'name' => ['max:128'],

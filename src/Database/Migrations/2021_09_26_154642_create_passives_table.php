@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateItemsTable extends Migration
+class CreatePassivesTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,9 +13,9 @@ class CreateItemsTable extends Migration
      */
     public function up()
     {
-        Schema::create('items', function (Blueprint $table) {
-            $table->id();
-            $table->unsignedInteger('item_id');
+        Schema::create('passives', function (Blueprint $table) {
+            $table->unsignedBigInteger('id');
+            $table->primary('id');
             $table->text('description');
             $table->string('device_name', 64)->nullable();
             $table->unsignedInteger('icon_id')->default(0);
@@ -37,6 +37,6 @@ class CreateItemsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('items');
+        Schema::dropIfExists('passives');
     }
 }

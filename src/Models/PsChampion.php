@@ -3,6 +3,7 @@
 namespace Anibalealvarezs\Paladins\Models;
 
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphToMany;
 
 class PsChampion extends PsBuilder
 {
@@ -16,40 +17,16 @@ class PsChampion extends PsBuilder
      * @var array
      */
     protected $fillable = [
-        'champion_id', 'name', 'name_english', 'on_rotation', 'on_weekly_rotation', 'card_url', 'icon_url', 'cons',
+        'id', 'name', 'name_english', 'on_rotation', 'on_weekly_rotation', 'card_url', 'icon_url', 'cons',
         'health', 'lore', 'pantheon', 'pros', 'roles', 'speed', 'title', 'type', 'latest_champion', 'ret_msg'
     ];
 
     /**
-     * Get the menu that owns the dish.
-     */
-    public static function getInstanceByChampionId($id, $matches = "")
-    {
-        $matches_array = [];
-        if ($matches) {
-            $matches_array = explode(',', $matches);
-        }
-        $self = self::where('champion_id', $id)->first();
-        if ($self) {
-            return self::find($self->id)
-                ->with(['items', 'abilities', 'talents', 'matches'])
-                ->whereHas('matches', function ($query) use ($matches_array) {
-                    if ($matches_array) {
-                        $query->where('match_id', $matches_array);
-                    } else {
-                        $query->whereNotNull('match_id');
-                    }
-                });
-        }
-        return false;
-    }
-
-    /**
      * Get the items for the menu.
      */
-    public function items(): HasMany
+    public function passives(): HasMany
     {
-        return $this->hasMany(PsPlayer::class, 'champion_id', 'champion_id');
+        return $this->hasMany(PsPassive::class, 'champion_id', 'id');
     }
 
     /**
@@ -57,7 +34,7 @@ class PsChampion extends PsBuilder
      */
     public function abilities(): HasMany
     {
-        return $this->hasMany(PsAbility::class, 'champion_id', 'champion_id');
+        return $this->hasMany(PsAbility::class, 'champion_id', 'id');
     }
 
     /**
@@ -65,21 +42,42 @@ class PsChampion extends PsBuilder
      */
     public function talents(): HasMany
     {
-        return $this->hasMany(PsTalent::class, 'champion_id', 'champion_id');
+        return $this->hasMany(PsTalent::class, 'champion_id', 'id');
     }
 
     /**
      * Get the items for the menu.
      */
-    public function matches(): HasMany
+    public function matchPlayers(): HasMany
     {
-        return $this->hasMany(PsMatchsHistory::class, 'champion_id', 'champion_id');
+        return $this->hasMany(PsMatchPlayer::class, 'champion_id', 'id');
+    }
+
+    /**
+     * Get the items for the menu.
+     */
+    public function championRanks(): HasMany
+    {
+        return $this->hasMany(PsChampionRank::class, 'champion_id', 'id');
+    }
+
+    /**
+     * Get the items for the menu.
+     */
+    public function loadouts(): HasMany
+    {
+        return $this->hasMany(PsLoadout::class, 'champion_id', 'id');
+    }
+
+    public function matches(): MorphToMany
+    {
+        return $this->morphedByMany(PsMatch::class, 'championable', 'championables', 'champion_id', 'championable_id')->with('matchPlayers');
     }
 
     public static function equivalences()
     {
         return [
-            'champion_id' => 'id',
+            'id' => 'id',
             'name' => 'Name',
             'name_english' => 'Name_English',
             'on_rotation' => 'OnFreeRotation',

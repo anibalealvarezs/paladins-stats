@@ -17,7 +17,7 @@ class PsPlayer extends PsBuilder
      * @var array
      */
     protected $fillable = [
-        'player_id', 'name', 'avatar_id', 'avatar_url', 'created_datetime', 'hours_played', 'last_login_datetime',
+        'id', 'name', 'avatar_id', 'avatar_url', 'created_datetime', 'hours_played', 'last_login_datetime',
         'leaves', 'level', 'loading_frame', 'losses', 'mastery_level', 'merged_players', 'minutes_played',
         'status_message', 'platform', 'region', 'team_id', 'team_name', 'tier_contest', 'tier_ranked_controller',
         'tier_ranked_kbm', 'title', 'achievements', 'worshippers', 'xp', 'wins', 'hz_gamer_tag', 'hz_player_name',
@@ -27,33 +27,17 @@ class PsPlayer extends PsBuilder
     /**
      * Get the menu that owns the dish.
      */
-    public static function getInstanceByPlayerId($id, $matches = "")
+    public function passives(): MorphToMany
     {
-        $matches_array = [];
-        if ($matches) {
-            $matches_array = explode(',', $matches);
-        }
-        $self = self::where('player_id', $id)->first();
-        if ($self) {
-            return self::find($self->id)
-                ->with(['items', 'rankeds', 'matches'])
-                ->whereHas('matches', function ($query) use ($matches_array) {
-                    if ($matches_array) {
-                        $query->where('match_id', $matches_array);
-                    } else {
-                        $query->whereNotNull('match_id');
-                    }
-                });
-        }
-        return false;
+        return $this->morphToMany(PsPassive::class, 'ppassivable', 'ppassivables', 'ppassivable_id', 'passive_id');
     }
 
     /**
-     * Get the items for the menu.
+     * Get the menu that owns the dish.
      */
-    public function items(): HasMany
+    public function talents(): MorphToMany
     {
-        return $this->hasMany(PsMatchsHistory::class, 'player_id', 'player_id');
+        return $this->morphToMany(PsTalent::class, 'ptalentable', 'ptalentables', 'ptalentable_id', 'talent_id');
     }
 
     /**
@@ -61,21 +45,42 @@ class PsPlayer extends PsBuilder
      */
     public function rankeds(): HasMany
     {
-        return $this->hasMany(PsRankedData::class, 'player_id', 'player_id');
+        return $this->hasMany(PsRankedData::class, 'player_id', 'id');
     }
 
     /**
      * Get the items for the menu.
      */
+    public function matchPlayers(): HasMany
+    {
+        return $this->hasMany(PsMatchPlayer::class, 'player_id', 'id');
+    }
+
+    /**
+     * Get the items for the menu.
+     */
+    public function championRanks(): HasMany
+    {
+        return $this->hasMany(PsChampionRank::class, 'player_id', 'id');
+    }
+
+    /**
+     * Get the items for the menu.
+     */
+    public function loadouts(): HasMany
+    {
+        return $this->hasMany(PsLoadout::class, 'player_id', 'id');
+    }
+
     public function matches(): MorphToMany
     {
-        return $this->morphToMany(PsMatchsHistory::class, 'pmatchable', 'pmatchables', 'match_id', 'match_id');
+        return $this->morphedByMany(PsMatch::class, 'playerable', 'playerables', 'player_id', 'playerable_id');
     }
 
     public static function equivalences()
     {
         return [
-            'player_id' => 'ActivePlayerId',
+            'id' => 'ActivePlayerId',
             'name' => 'Name',
             'avatar_id' => 'AvatarId',
             'avatar_url' => 'AvatarURL',

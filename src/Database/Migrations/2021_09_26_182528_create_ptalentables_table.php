@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateTalentablesTable extends Migration
+class CreatePtalentablesTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,9 +13,9 @@ class CreateTalentablesTable extends Migration
      */
     public function up()
     {
-        Schema::create('talentables', function (Blueprint $table) {
+        Schema::create('ptalentables', function (Blueprint $table) {
             $table->integer('talent_id');
-            $table->morphs('talentable');
+            $table->morphs('ptalentable');
         });
     }
 
@@ -26,6 +26,6 @@ class CreateTalentablesTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('talentables');
+        Schema::dropIfExists('ptalentables');
     }
 }

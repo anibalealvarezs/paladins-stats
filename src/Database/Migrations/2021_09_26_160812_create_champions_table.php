@@ -14,8 +14,8 @@ class CreateChampionsTable extends Migration
     public function up()
     {
         Schema::create('champions', function (Blueprint $table) {
-            $table->id();
-            $table->unsignedInteger('champion_id');
+            $table->unsignedBigInteger('id');
+            $table->primary('id');
             $table->string('name', 64);
             $table->string('name_english', 64);
             $table->boolean('on_rotation')->default(false);

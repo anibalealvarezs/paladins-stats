@@ -34,7 +34,7 @@ class PsRankedData extends PsBuilder
      */
     public function player(): BelongsTo
     {
-        return $this->belongsTo(PsPlayer::class, 'player_id', 'player_id');
+        return $this->belongsTo(PsPlayer::class);
     }
 
     public static function equivalences()

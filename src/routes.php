@@ -2,17 +2,17 @@
 
 use Anibalealvarezs\Paladins\Controllers\PsFrontController as FrontController;
 use Anibalealvarezs\Paladins\Helpers\PsHelpers;
-use Anibalealvarezs\Paladins\Models\PsAbility;
+use Anibalealvarezs\Paladins\Models\PsMatch;
 use Anibalealvarezs\Paladins\Models\PsChampion;
-use Anibalealvarezs\Paladins\Models\PsItem;
-use Anibalealvarezs\Paladins\Models\PsMatchsHistory;
+use Anibalealvarezs\Paladins\Models\PsPassive;
+use Anibalealvarezs\Paladins\Models\PsMatchPlayer;
 use Anibalealvarezs\Paladins\Models\PsPlayer;
 use Anibalealvarezs\Paladins\Models\PsRankedData;
 use Anibalealvarezs\Paladins\Models\PsTalent;
 
 Route::get(
     '/abilities/{id}',
-    [PsAbility::class, 'getInstanceByAbilityId']
+    [PsMatch::class, 'getInstanceByAbilityId']
 )->middleware(['web', 'auth'])->name('*', 'abilities');
 Route::get(
     '/champion/{id}/{matches?}',
@@ -20,11 +20,11 @@ Route::get(
 )->middleware(['web', 'auth'])->name('*', 'champion');
 Route::get(
     '/item/{id}',
-    [PsItem::class, 'getInstanceByItemId']
+    [PsPassive::class, 'getInstanceByItemId']
 )->middleware(['web', 'auth'])->name('*', 'item');
 Route::get(
     '/matchs/{id}/{player_id?}/{champion_ids?}/{players?}',
-    [PsMatchsHistory::class, 'getCollectionByMatchId']
+    [PsMatchPlayer::class, 'getCollectionByMatchId']
 )->middleware(['web', 'auth'])->name('*', 'matchs');
 Route::get(
     '/player/{id}/{matches?}',

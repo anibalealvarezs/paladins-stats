@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateMatchsHistoryTable extends Migration
+class CreateMatchPlayersTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,7 +13,7 @@ class CreateMatchsHistoryTable extends Migration
      */
     public function up()
     {
-        Schema::create('matchs_history', function (Blueprint $table) {
+        Schema::create('match_players', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('match_id');
             $table->unsignedInteger('champion_id');
@@ -51,14 +51,8 @@ class CreateMatchsHistoryTable extends Migration
             $table->integer('kills')->default(0);
             $table->integer('killing_spree')->default(0);
             $table->integer('level')->default(0);
-            $table->string('map', 128);
-            $table->unsignedInteger('match_queue_id');
-            $table->dateTime('match_datetime');
-            $table->integer('minutes')->default(0);
             $table->integer('multikill_max')->default(0);
             $table->integer('objective_assists')->default(0);
-            $table->string('queue', 128);
-            $table->string('region', 128);
             $table->string('skin', 128);
             $table->unsignedInteger('skin_id');
             $table->integer('surrendered')->default(0);
@@ -80,6 +74,6 @@ class CreateMatchsHistoryTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('matchs_history');
+        Schema::dropIfExists('match_players');
     }
 }

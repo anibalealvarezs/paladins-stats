@@ -5,9 +5,9 @@ namespace Anibalealvarezs\Paladins\Models;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 
-class PsMatchsHistory extends PsBuilder
+class PsMatchPlayer extends PsBuilder
 {
-    protected $table = 'matchs_history';
+    protected $table = 'match_players';
 
     public $timestamps = false;
 
@@ -19,69 +19,31 @@ class PsMatchsHistory extends PsBuilder
      * @var array
      */
     protected $fillable = [
-        'match_id', 'champion_id', 'item_1', 'item_2', 'item_3', 'item_4', 'item_level_1', 'item_level_2', 'item_level_3', 'item_level_4',
+        'match_id', 'champion_id', 'player_id',
+        'item_1', 'item_2', 'item_3', 'item_4', 'item_level_1', 'item_level_2', 'item_level_3', 'item_level_4',
         'assists', 'creeps', 'damage', 'damage_bot', 'damage_done_in_hand', 'damage_mitigated', 'damage_structure',
         'damage_taken', 'damage_taken_magical', 'damage_taken_physical', 'deaths', 'distance_traveled', 'gold', 'healing',
         'healing_bot', 'healing_player_self', 'talent1', 'talent2', 'talent3', 'talent4', 'talent5', 'talent6', 'kills',
-        'killing_spree', 'level', 'map', 'match_queue_id', 'match_datetime', 'minutes', 'multikill_max', 'objective_assists',
-        'queue', 'region', 'skin', 'skin_id', 'surrendered', 'task_force', 'team1_score', 'team2_score', 'time_in_match',
-        'wards_placed', 'win_status', 'winning_task_force', 'ret_msg'
+        'killing_spree', 'level', 'multikill_max', 'objective_assists', 'skin', 'skin_id', 'surrendered', 'task_force',
+        'team1_score', 'team2_score', 'time_in_match', 'wards_placed', 'win_status', 'winning_task_force', 'ret_msg'
     ];
-
-    /**
-     * Get the menu that owns the dish.
-     */
-    public static function getCollectionByMatchId($id, $player_id = 0, $champion_ids = "", $players = "")
-    {
-        $champion_ids_array = [];
-        if ($champion_ids) {
-            $champion_ids_array = explode(',', $champion_ids);
-        }
-        $players_array = [];
-        if ($players) {
-            $players_array = explode(',', $players);
-        }
-        return self::where('match_id', $id)
-            ->whereHas('player', function ($query) use ($player_id) {
-                if ($player_id) {
-                    $query->where('player_id', $player_id);
-                } else {
-                    $query->whereNotNull('player_id');
-                }
-            })->whereHas('champion', function ($query) use ($champion_ids_array) {
-                if ($champion_ids_array) {
-                    $query->whereIn('champion_id', $champion_ids_array);
-                } else {
-                    $query->whereNotNull('champion_id');
-                }
-            })->whereHas('players', function ($query) use ($players_array) {
-                if ($players_array) {
-                    foreach($players_array as $p) {
-                        $query->whereIn('player_id', $p);
-                    }
-                }
-            })->with(['player', 'champion', 'players', 'talents'])->get();
-    }
 
     /**
      * Get the menu that owns the dish.
      */
     public function player(): BelongsTo
     {
-        return $this->belongsTo(PsPlayer::class, 'player_id', 'player_id');
+        return $this->belongsTo(PsPlayer::class);
     }
 
-    /**
-     * Get the menu that owns the dish.
-     */
     public function champion(): BelongsTo
     {
-        return $this->belongsTo(PsChampion::class, 'champion_id', 'champion_id');
+        return $this->belongsTo(PsChampion::class);
     }
 
-    public function players(): MorphToMany
+    public function match(): BelongsTo
     {
-        return $this->morphedByMany(PsPlayer::class, 'pmatchable', null, 'match_id');
+        return $this->belongsTo(PsMatch::class);
     }
 
     /**
@@ -89,7 +51,15 @@ class PsMatchsHistory extends PsBuilder
      */
     public function talents(): MorphToMany
     {
-        return $this->morphToMany(PsTalent::class, 'talentable', 'talentables', 'talent_id', 'talent_id');
+        return $this->morphToMany(PsTalent::class, 'talentable', 'talentables', 'talentable_id', 'talent_id');
+    }
+
+    /**
+     * Get the items for the menu.
+     */
+    public function passives(): MorphToMany
+    {
+        return $this->morphToMany(PsPassive::class, 'passivable', 'passivables', 'passivable_id', 'passive_id');
     }
 
     public static function equivalences()
@@ -131,14 +101,8 @@ class PsMatchsHistory extends PsBuilder
             'kills' => 'Kills',
             'killing_spree' => 'Killing_Spree',
             'level' => 'Level',
-            'map' => 'Map_Game',
-            'match_queue_id' => 'Match_Queue_Id',
-            'match_datetime' => 'Match_Time',
-            'minutes' => 'Minutes',
             'multikill_max' => 'Multi_kill_Max',
             'objective_assists' => 'Objective_Assists',
-            'queue' => 'Queue',
-            'region' => 'Region',
             'skin' => 'Skin',
             'skin_id' => 'SkinId',
             'surrendered' => 'Surrendered',

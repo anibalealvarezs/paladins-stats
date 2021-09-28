@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateAbilitiesTable extends Migration
+class CreateLoadoutsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,16 +13,12 @@ class CreateAbilitiesTable extends Migration
      */
     public function up()
     {
-        Schema::create('abilities', function (Blueprint $table) {
+        Schema::create('loadouts', function (Blueprint $table) {
             $table->unsignedBigInteger('id');
-            $table->primary('id');
-            $table->string('name', 64);
-            $table->text('description');
-            $table->text('summary');
-            $table->string('url', 256);
-            $table->string('damage_type', 32);
-            $table->integer('recharge_seconds')->default(0);
+            $table->string('name', 64)->nullable();
             $table->unsignedInteger('champion_id');
+            $table->unsignedInteger('player_id');
+            $table->string('ret_msg', 1024)->nullable();
         });
     }
 
@@ -33,6 +29,6 @@ class CreateAbilitiesTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('abilities');
+        Schema::dropIfExists('loadouts');
     }
 }

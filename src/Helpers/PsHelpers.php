@@ -3,15 +3,20 @@
 namespace Anibalealvarezs\Paladins\Helpers;
 
 use Anibalealvarezs\Paladins\Models\PsAbility;
+use Anibalealvarezs\Paladins\Models\PsLoadout;
+use Anibalealvarezs\Paladins\Models\PsLoadoutPassive;
+use Anibalealvarezs\Paladins\Models\PsChampionRank;
+use Anibalealvarezs\Paladins\Models\PsMatch;
 use Anibalealvarezs\Paladins\Models\PsChampion;
-use Anibalealvarezs\Paladins\Models\PsItem;
-use Anibalealvarezs\Paladins\Models\PsMatchsHistory;
+use Anibalealvarezs\Paladins\Models\PsPassive;
+use Anibalealvarezs\Paladins\Models\PsMatchPlayer;
 use Anibalealvarezs\Paladins\Models\PsPlayer;
 use Anibalealvarezs\Paladins\Models\PsRankedData;
 use Anibalealvarezs\Paladins\Models\PsTalent;
 use Anibalealvarezs\Projectbuilder\Helpers\PbHelpers;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\DB;
 use PaladinsDev\PHP\PaladinsAPI;
 
 class PsHelpers extends PbHelpers
@@ -32,11 +37,74 @@ class PsHelpers extends PbHelpers
             $useAPI = true;
             switch($method) {
                 case 'getItems':
-                    $exampleItem = PsItem::first();
-                    if ($exampleItem) {
+                    $examplePassive = PsPassive::first();
+                    if ($examplePassive) {
                         $useAPI = false;
-                        $items = PsItem::with('champion')->get()->toArray();
-                        print("<pre>".print_r($items,true)."</pre>");
+                        $passives = PsPassive::with(
+                            'champion', 'players', 'matchPlayers'
+                        )->get()->toArray();
+                        print("<pre>".print_r($passives,true)."</pre>");
+                    }
+                    break;
+                case 'getChampions':
+                    $exampleChampion = PsChampion::first();
+                    if ($exampleChampion) {
+                        $useAPI = false;
+                        $champions = PsChampion::with(
+                            'passives','abilities', 'talents', 'championRanks', 'loadouts', 'matches'
+                        )->get()->toArray();
+                        print("<pre>".print_r($champions,true)."</pre>");
+                    }
+                    break;
+                case 'getPlayerMatchHistory':
+                    $exampleMatchPlayer = PsMatchPlayer::where('player_id', $var1)->first();
+                    if ($exampleMatchPlayer) {
+                        $useAPI = false;
+                        $matchPlayer = PsMatchPlayer::where('player_id', $var1)->with(
+                            'player','champion', 'match', 'talents', 'passives'
+                        )->get()->toArray();
+                        print("<pre>".print_r($matchPlayer,true)."</pre>");
+                    }
+                    break;
+                case 'getPlayer':
+                    $examplePlayer = PsPlayer::find($var1);
+                    if ($examplePlayer) {
+                        $useAPI = false;
+                        $player = PsPlayer::where('id', $var1)->with(
+                            'passives','talents', 'rankeds', 'matchPlayers', 'championRanks', 'loadouts', 'matches'
+                        )->get()->toArray();
+                        print("<pre>".print_r($player,true)."</pre>");
+                    }
+                    break;
+                case 'getPlayerBatch':
+                    $array = explode(',', $var1);
+                    $examplePlayer = PsPlayer::whereIn('id', $array)->first();
+                    if ($examplePlayer) {
+                        $useAPI = false;
+                        $players = PsPlayer::whereIn('id', $array)->with(
+                            'passives','talents', 'rankeds', 'matchPlayers', 'championRanks', 'loadouts', 'matches'
+                        )->get()->toArray();
+                        print("<pre>".print_r($players,true)."</pre>");
+                    }
+                    break;
+                case 'getChampionRanks':
+                    $exampleRank = PsChampionRank::where('player_id', $var1)->first();
+                    if ($exampleRank) {
+                        $useAPI = false;
+                        $ranks = PsChampionRank::where('player_id', $var1)->with(
+                            'champion','player'
+                        )->get()->toArray();
+                        print("<pre>".print_r($ranks,true)."</pre>");
+                    }
+                    break;
+                case 'getPlayerLoadouts':
+                    $exampleLoadout = PsLoadout::where('player_id', $var1)->first();
+                    if ($exampleLoadout) {
+                        $useAPI = false;
+                        $loadouts = PsLoadout::where('player_id', $var1)->with(
+                            'champion','player', 'passives'
+                        )->get()->toArray();
+                        print("<pre>".print_r($loadouts,true)."</pre>");
                     }
                     break;
                 default:
@@ -97,78 +165,135 @@ class PsHelpers extends PbHelpers
         switch($element) {
             case 'getChampions':
                 foreach($data as $d) {
-                    // Save Abilities
+                    // Save/Update Champion
+                    $equivalences = PsChampion::equivalences();
+                    $where = ['id' => $d['id']];
+                    $exec = [];
+                    foreach($equivalences as $key => $value) {
+                        if (in_array($key, ['on_rotation', 'on_weekly_rotation'])) {
+                            $exec[$key] = filter_var($d[$value], FILTER_VALIDATE_BOOLEAN);
+                        } else {
+                            $exec[$key] = $d[$value];
+                        }
+                    }
+                    PsChampion::updateOrCreate($where, $exec);
+                    $champion = PsChampion::find($d['id']);
+                        // Save/Update Abilities
                     $equivalences = PsAbility::equivalences();
                     $counter = 1;
                     while ($counter <= 5) {
                         if ($d['AbilityId'.$counter]) {
-                            $ability = PsAbility::getInstanceByAbilityId($d['AbilityId'.$counter]);
-                            if (!$ability) {
-                                $newAbility = new PsAbility();
-                                $newAbility->ability_id = $d['AbilityId'.$counter];
-                                $newAbility->name = $d['Ability'.$counter];
-                                $newAbility->champion_id = $d['id'];
-                                foreach($equivalences as $key => $value) {
-                                    $newAbility->{$key} = $d['Ability_'.$counter][$value];
-                                }
-                                $newAbility->save();
+                            // Save/Update Ability
+                            $where = ['id' => $d['AbilityId'.$counter]];
+                            $exec = ['name' => $d['Ability'.$counter], 'champion_id' => $champion->id];
+                            foreach($equivalences as $key => $value) {
+                                $exec[$key] = $d['Ability_'.$counter][$value];
                             }
+                            PsAbility::updateOrCreate($where, $exec);
                         }
                         $counter++;
-                    }
-                    // Save Champion
-                    $equivalences = PsChampion::equivalences();
-                    $champion = PsChampion::getInstanceByChampionId($d['id']);
-                    if (!$champion) {
-                        $newChampion = new PsChampion();
-                        foreach($equivalences as $key => $value) {
-                            if (in_array($key, ['on_rotation', 'on_weekly_rotation'])) {
-                                $newChampion->{$key} = filter_var($d[$value], FILTER_VALIDATE_BOOLEAN);
-                            } else {
-                                $newChampion->{$key} = $d[$value];
-                            }
-                        }
-                        $newChampion->save();
                     }
                 }
                 break;
             case 'getPlayerMatchHistory':
                 foreach($data as $d) {
-                    // Save Talents
+                    // Save/Update Talents
                     $counter = 1;
                     while ($counter <= 6) {
                         if ($d['ItemId'.$counter]) {
-                            $talent = PsTalent::getInstanceByTalentId($d['ItemId'.$counter]);
-                            if (!$talent) {
-                                $newTalent = new PsTalent();
-                                $newTalent->talent_id = $d['ItemId'.$counter];
-                                $newTalent->name = $d['Item_'.$counter];
-                                $newTalent->champion_id = $d['ChampionId'];
-                                $newTalent->save();
+                            // Save/Update Talent
+                            $where = ['id' => $d['ItemId'.$counter]];
+                            $exec = ['name' => $d['Item_'.$counter], 'champion_id' => $d['ChampionId']];
+                            PsTalent::updateOrCreate($where, $exec);
+                        }
+                        $counter++;
+                    }
+                    // Save/Update Match
+                    $equivalences = PsMatch::equivalences();
+                    $where = ['id' => $d['Match']];
+                    $exec = [];
+                    foreach($equivalences as $key => $value) {
+                        if (in_array($key, ['match_datetime'])) {
+                            $exec[$key] = Carbon::createFromFormat('n/j/Y g:i:s A', $d[$value])->toDateTimeString();
+                        } else {
+                            $exec[$key] = $d[$value];
+                        }
+                    }
+                    PsMatch::updateOrCreate($where, $exec);
+                    $match = PsMatch::find($d['Match']);
+                    // Save/Update Playerable
+                    $player = PsPlayer::find($d['playerId']);
+                    if ($player) {
+                        $relation = DB::table('playerables')
+                            ->where('player_id', $d['playerId'])
+                            ->where('playerable_id', $match->id)
+                            ->first();
+                        if (!$relation) {
+                            $match->players()->save($player);
+                        }
+                    }
+                    // Save/Update Championable
+                    $champion = PsChampion::find($d['ChampionId']);
+                    if ($champion) {
+                        $relation = DB::table('championables')
+                            ->where('champion_id', $d['ChampionId'])
+                            ->where('championable_id', $match->id)
+                            ->first();
+                        if (!$relation) {
+                            $match->champions()->save($champion);
+                        }
+                    }
+                    // Save/Update MatchPlayer
+                    $equivalences = PsMatchPlayer::equivalences();
+                    $where = ['match_id' => $d['Match'], 'player_id' => $d['playerId']];
+                    $exec = [];
+                    foreach($equivalences as $key => $value) {
+                        $exec[$key] = $d[$value];
+                    }
+                    PsMatchPlayer::updateOrCreate($where, $exec);
+                    $matchPlayer = PsMatchPlayer::where($where)->first();
+                    // Save/Update Talentables
+                    $counter = 1;
+                    while ($counter <= 6) {
+                        if ($d['ItemId'.$counter]) {
+                            // Save/Update Talentable
+                            $talent = PsTalent::find($d['ItemId'.$counter]);
+                            if ($talent) {
+                                $relation = DB::table('talentables')
+                                    ->where('talent_id', $d['ItemId'.$counter])
+                                    ->where('talentable_id', $matchPlayer->id)
+                                    ->first();
+                                if (!$relation) {
+                                    $matchPlayer->talents()->save($talent);
+                                }
                             }
                         }
                         $counter++;
                     }
-                    // Save Match
-                    $equivalences = PsMatchsHistory::equivalences();
-                    $match = PsMatchsHistory::getCollectionByMatchId($d['Match'], $d['playerId']);
-                    if (count($match) == 0) {
-                        $newMatch = new PsMatchsHistory();
-                        foreach($equivalences as $key => $value) {
-                            if (in_array($key, ['match_datetime'])) {
-                                $newMatch->{$key} = Carbon::createFromFormat('n/j/Y g:i:s A', $d[$value])->toDateTimeString();
-                            } else {
-                                $newMatch->{$key} = $d[$value];
+                    // Save/Update Passivables
+                    $counter = 1;
+                    while ($counter <= 4) {
+                        if ($d['ActiveId'.$counter]) {
+                            // Save/Update Passivable
+                            $passive = PsPassive::find($d['ActiveId'.$counter]);
+                            if ($passive) {
+                                $relation = DB::table('passivables')
+                                    ->where('passive_id', $d['ActiveId'.$counter])
+                                    ->where('passivable_id', $matchPlayer->id)
+                                    ->first();
+                                if (!$relation) {
+                                    $matchPlayer->passives()->save($passive, ['passive_level' => $d['ActiveLevel'.$counter]]);
+                                }
                             }
                         }
-                        $newMatch->save();
+                        $counter++;
                     }
                 }
                 break;
             case 'getPlayer':
             case 'getPlayerBatch':
                 foreach($data as $d) {
-                    // Save Rankeds
+                    // Save/Update Rankeds
                     $equivalences = PsRankedData::equivalences();
                     $names = [
                         'RankedConquest' => 'Conquest',
@@ -176,43 +301,74 @@ class PsHelpers extends PbHelpers
                         'RankedKBM' => 'Ranked KBM'
                     ];
                     foreach ($names as $key => $value) {
-                        $ranked = PsRankedData::getInstanceByPlayerId($d['ActivePlayerId'], $value);
-                        if (!$ranked) {
-                            $newRanked = new PsRankedData();
-                            $newRanked->player_id = $d['ActivePlayerId'];
-                            foreach($equivalences as $key2 => $value2) {
-                                $newRanked->{$key2} = $d[$key][$value2];
-                            }
-                            $newRanked->save();
+                        // Save/Update Ranked
+                        $where = ['player_id' => $d['ActivePlayerId'], 'name' => $value];
+                        $exec = [];
+                        foreach($equivalences as $key2 => $value2) {
+                            $exec[$key2] = $d[$key][$value2];
                         }
+                        PsRankedData::updateOrCreate($where, $exec);
                     }
-                    // Save Player
+                    // Save/Update Player
                     $equivalences = PsPlayer::equivalences();
-                    $player = PsPlayer::getInstanceByPlayerId($d['ActivePlayerId']);
-                    if (!$player) {
-                        $newPlayer = new PsPlayer();
-                        foreach($equivalences as $key => $value) {
-                            if (in_array($key, ['created_datetime', 'last_login_datetime'])) {
-                                $newPlayer->{$key} = Carbon::createFromFormat('n/j/Y g:i:s A', $d[$value])->toDateTimeString();
-                            } else {
-                                $newPlayer->{$key} = $d[$value];
-                            }
+                    $where = ['id' => $d['ActivePlayerId']];
+                    $exec = [];
+                    foreach($equivalences as $key => $value) {
+                        if (in_array($key, ['created_datetime', 'last_login_datetime'])) {
+                            $exec[$key] = Carbon::createFromFormat('n/j/Y g:i:s A', $d[$value])->toDateTimeString();
+                        } else {
+                            $exec[$key] = $d[$value];
                         }
-                        $newPlayer->save();
                     }
+                    PsPlayer::updateOrCreate($where, $exec);
                 }
                 break;
             case 'getItems':
-                // Save Items
-                $equivalences = PsItem::equivalences();
                 foreach($data as $d) {
-                    $item = PsItem::getInstanceByItemId($d['ItemId']);
-                    if (!$item) {
-                        $newItem = new PsItem();
-                        foreach($equivalences as $key => $value) {
-                            $newItem->{$key} = $d[$value];
+                    // Save/Update Passive
+                    $equivalences = PsPassive::equivalences();
+                    $where = ['id' => $d['ItemId']];
+                    $exec = [];
+                    foreach($equivalences as $key => $value) {
+                        $exec[$key] = $d[$value];
+                    }
+                    PsPassive::updateOrCreate($where, $exec);
+                }
+                break;
+            case 'getChampionRanks':
+                foreach($data as $d) {
+                    // Save/Update ChampionRank
+                    $equivalences = PsChampionRank::equivalences();
+                    $where = ['champion_id' => $d['champion_id'], 'player_id' => $d['player_id']];
+                    $exec = [];
+                    foreach($equivalences as $key => $value) {
+                        if (in_array($key, ['last_played'])) {
+                            $exec[$key] = Carbon::createFromFormat('n/j/Y g:i:s A', $d[$value])->toDateTimeString();
+                        } else {
+                            $exec[$key] = $d[$value];
                         }
-                        $newItem->save();
+                    }
+                    PsChampionRank::updateOrCreate($where, $exec);
+                }
+                break;
+            case 'getPlayerLoadouts':
+                foreach($data as $d) {
+                    // Save/Update Loadout
+                    $equivalences = PsLoadout::equivalences();
+                    $where = ['id' => $d['DeckId']];
+                    $exec = [];
+                    foreach($equivalences as $key => $value) {
+                        $exec[$key] = $d[$value];
+                    }
+                    PsLoadout::updateOrCreate($where, $exec);
+                    $loadout = PsLoadout::find($d['DeckId']);
+                    // Save/Update LoadoutPassives
+                    PsLoadoutPassive::where('loadout_id', $loadout->id)->delete();
+                    foreach($d['LoadoutItems'] as $l) {
+                        // Save/Update LoadoutPassive
+                        $where = ['loadout_id' => $loadout->id, 'passive_id' => $l['ItemId']];
+                        $exec = ['points' => $l['Points']];
+                        PsLoadoutPassive::updateOrCreate($where, $exec);
                     }
                 }
                 break;

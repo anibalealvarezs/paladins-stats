@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreatePmatchablesTable extends Migration
+class CreatePpassivablesTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,9 +13,9 @@ class CreatePmatchablesTable extends Migration
      */
     public function up()
     {
-        Schema::create('pmatchables', function (Blueprint $table) {
-            $table->increments('match_id');
-            $table->morphs('pmatchable');
+        Schema::create('ppassivables', function (Blueprint $table) {
+            $table->integer('passive_id');
+            $table->morphs('ppassivable');
         });
     }
 
@@ -26,6 +26,6 @@ class CreatePmatchablesTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('pmatchables');
+        Schema::dropIfExists('ppassivables');
     }
 }

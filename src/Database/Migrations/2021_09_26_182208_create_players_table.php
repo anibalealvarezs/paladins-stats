@@ -14,11 +14,11 @@ class CreatePlayersTable extends Migration
     public function up()
     {
         Schema::create('players', function (Blueprint $table) {
-            $table->id();
-            $table->unsignedInteger('player_id');
+            $table->unsignedBigInteger('id');
+            $table->primary('id');
             $table->string('name', 64);
-            $table->unsignedInteger('avatar_id');
-            $table->string('avatar_url', 256);
+            $table->unsignedInteger('avatar_id')->nullable();
+            $table->string('avatar_url', 256)->nullable();
             $table->dateTime('created_datetime');
             $table->integer('hours_played')->default(0);
             $table->dateTime('last_login_datetime');
@@ -33,11 +33,11 @@ class CreatePlayersTable extends Migration
             $table->string('platform', 32);
             $table->string('region', 64);
             $table->unsignedInteger('team_id')->default(0);
-            $table->string('team_name', 64);
+            $table->string('team_name', 64)->nullable();
             $table->integer('tier_contest')->default(0);
             $table->integer('tier_ranked_controller')->default(0);
             $table->integer('tier_ranked_kbm')->default(0);
-            $table->string('title', 64);
+            $table->string('title', 64)->nullable();
             $table->integer('achievements')->default(0);
             $table->bigInteger('worshippers')->default(0);
             $table->bigInteger('xp')->default(0);

@@ -3,10 +3,11 @@
 namespace Anibalealvarezs\Paladins\Models;
 
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\MorphToMany;
 
-class PsItem extends PsBuilder
+class PsPassive extends PsBuilder
 {
-    protected $table = 'items';
+    protected $table = 'passives';
 
     public $timestamps = false;
 
@@ -16,34 +17,32 @@ class PsItem extends PsBuilder
      * @var array
      */
     protected $fillable = [
-        'item_id', 'description', 'device_name', 'icon_id', 'price', 'short_desc', 'champion_id', 'icon_url',
+        'id', 'description', 'device_name', 'icon_id', 'price', 'short_desc', 'champion_id', 'icon_url',
         'type', 'recharge_seconds', 'ret_msg', 'talent_reward_level'
     ];
 
     /**
      * Get the menu that owns the dish.
      */
-    public static function getInstanceByItemId($id)
-    {
-        $self = self::where('item_id', $id)->first();
-        if ($self) {
-            return self::find($self->id)->with('champion');
-        }
-        return false;
-    }
-
-    /**
-     * Get the menu that owns the dish.
-     */
     public function champion(): BelongsTo
     {
-        return $this->belongsTo(PsChampion::class, 'champion_id', 'champion_id');
+        return $this->belongsTo(PsChampion::class);
+    }
+
+    public function matchPlayers(): MorphToMany
+    {
+        return $this->morphedByMany(PsMatchPlayer::class, 'passivable', 'passivables', 'passive_id', 'passivable_id');
+    }
+
+    public function players(): MorphToMany
+    {
+        return $this->morphedByMany(PsPlayer::class, 'ppassivable', 'ppassivables', 'passive_id', 'ppassivable_id');
     }
 
     public static function equivalences()
     {
         return [
-            'item_id' => 'ItemId',
+            'id' => 'ItemId',
             'description' => 'Description',
             'device_name' => 'DeviceName',
             'icon_id' => 'IconId',
