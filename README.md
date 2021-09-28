@@ -11,6 +11,12 @@ If [Project Builder](https://github.com/anibalealvarezs/projectbuilder-package) 
 composer require anibalealvarezs/paladins-stats --no-cache
 ```
 
+#### 2. Add the following vars to your .env file
+```dotenv
+PALADINS_DEVID=XXXX
+PALADINS_AUTHKEY=XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+```
+
 #### 2. Clear config cache
 ```
 php artisan config:clear
