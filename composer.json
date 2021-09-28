@@ -34,6 +34,10 @@
         {
             "type": "composer",
             "url": "https://satis.anibalalvarez.com"
+        },
+        {
+            "type": "vcs",
+            "url": "https://github.com/anibalealvarezs/PHP-API"
         }
     ],
     "extra": {
