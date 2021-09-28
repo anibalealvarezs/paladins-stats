@@ -7,7 +7,7 @@
 If [Project Builder](https://github.com/anibalealvarezs/projectbuilder-package) ***WASN'T*** installed previously, go to that repository and follow the installation process before continuing
 
 #### 1. Require the package
-```
+```shell
 composer require anibalealvarezs/paladins-stats --no-cache
 ```
 
@@ -17,33 +17,49 @@ PALADINS_DEVID=XXXX
 PALADINS_AUTHKEY=XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 ```
 
-#### 2. Clear config cache
+#### 3. Add the following vars to your ```/config/app.php``` file
+```php
+/*
+|--------------------------------------------------------------------------
+| Paladins Credentials
+|--------------------------------------------------------------------------
+|
+| Paladins Credentials for communicating with Paladins API
+|
+*/
+
+'paladins_devid' => env('PALADINS_DEVID'),
+
+'paladins_authkey' => env('PALADINS_AUTHKEY'),
 ```
+
+#### 4. Clear config cache
+```shell
 php artisan config:clear
 ```
 
-#### 3. Migrate the DB
-```
+#### 5. Migrate the DB
+```shell
 php artisan migrate
 php artisan db:seed --class=\\Anibalealvarezs\\Paladins\\Database\\Seeders\\PsMainSeeder
 ```
 
-#### 4. OPTIONALLY, seed the DB step by step
+#### 6. OPTIONALLY, seed the DB step by step
 These are the default seeders in case you want to run them manually
-```
+```shell
 php artisan db:seed --class="Anibalealvarezs\Paladins\Database\Seeders\PsModuleSeeder"
 php artisan db:seed --class="Anibalealvarezs\Paladins\Database\Seeders\PsConfigSeeder"
 php artisan db:seed --class="Anibalealvarezs\Paladins\Database\Seeders\PsPermissionsSeeder"
 php artisan db:seed --class="Anibalealvarezs\Paladins\Database\Seeders\PsNavigationSeeder"
 ```
 
-### 5. Publish Vue components and libraries
+### 7. Publish Vue components and libraries
 Publish all necessary files
-```
+```shell
 php artisan vendor:publish --provider="Anibalealvarezs\Paladins\Providers\PsViewServiceProvider" --tag="paladins-views" --force
 ```
 or publish them one by one
-```
+```shell
 php artisan vendor:publish --provider="Anibalealvarezs\Paladins\Providers\PsViewServiceProvider" --tag="paladins-components" --force
 php artisan vendor:publish --provider="Anibalealvarezs\Paladins\Providers\PsViewServiceProvider" --tag="paladins-js" --force
 php artisan vendor:publish --provider="Anibalealvarezs\Paladins\Providers\PsViewServiceProvider" --tag="paladins-css" --force
@@ -51,29 +67,29 @@ php artisan vendor:publish --provider="Anibalealvarezs\Paladins\Providers\PsView
 php artisan vendor:publish --provider="Anibalealvarezs\Paladins\Providers\PsViewServiceProvider" --tag="paladins-core" --force
 ```
 
-### 6. Add resources to /webpack.mix.js
-```
+### 8. Add resources to /webpack.mix.js
+```javascript
 
 ```
 
-### 7. Install new resources as dependencies
-```
+### 9. Install new resources as dependencies
+```javascript
 
 ```
 
-### 8. Recompile app.js
+### 10. Recompile app.js
 For production:
-```
+```shell
 npm run prod
 ```
 For developing:
-```
+```shell
 npm run watch
 ```
 
 ### Useful Commands:
 
-```
+```shell
 php artisan cache:clear
 php artisan route:clear
 php artisan config:clear

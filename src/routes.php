@@ -13,31 +13,31 @@ use Anibalealvarezs\Paladins\Models\PsTalent;
 Route::get(
     '/abilities/{id}',
     [PsMatch::class, 'getInstanceByAbilityId']
-)->middleware(['web', 'auth'])->name('*', 'abilities');
+)->middleware(['web', 'auth'])->name('abilities');
 Route::get(
     '/champion/{id}/{matches?}',
     [PsChampion::class, 'getInstanceByChampionId']
-)->middleware(['web', 'auth'])->name('*', 'champion');
+)->middleware(['web', 'auth'])->name('champion');
 Route::get(
     '/item/{id}',
     [PsPassive::class, 'getInstanceByItemId']
-)->middleware(['web', 'auth'])->name('*', 'item');
+)->middleware(['web', 'auth'])->name('item');
 Route::get(
     '/matchs/{id}/{player_id?}/{champion_ids?}/{players?}',
     [PsMatchPlayer::class, 'getCollectionByMatchId']
-)->middleware(['web', 'auth'])->name('*', 'matchs');
+)->middleware(['web', 'auth'])->name('matchs');
 Route::get(
     '/player/{id}/{matches?}',
     [PsPlayer::class, 'getInstanceByPlayerId']
-)->middleware(['web', 'auth'])->name('*', 'player');
+)->middleware(['web', 'auth'])->name('player');
 Route::get(
     '/ranked/{player_id}/{$name}',
     [PsRankedData::class, 'getInstanceByPlayerId']
-)->middleware(['web', 'auth'])->name('*', 'ranked');
+)->middleware(['web', 'auth'])->name('ranked');
 Route::get(
     '/talent/{id}/{matches?}',
     [PsTalent::class, 'getInstanceByTalentId']
-)->middleware(['web', 'auth'])->name('*', 'talent');
+)->middleware(['web', 'auth'])->name('talent');
 
 Route::get(
     '/paladins',
