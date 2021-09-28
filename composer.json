@@ -21,7 +21,9 @@
         }
     ],
     "require": {
-        "anibalealvarezs/projectbuilder-package": "1.2.3"
+        "anibalealvarezs/projectbuilder-package": "1.2.3",
+        "halfpetal/illuminate-onoi-cache": "^1.0",
+        "paladinsdev/php-api": "dev-master"
     },
     "autoload": {
         "psr-4": {
