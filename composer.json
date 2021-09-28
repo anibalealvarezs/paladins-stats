@@ -10,7 +10,7 @@
     ],
     "homepage": "https://anibalalvarez.com",
     "license": "MIT",
-    "version" : "1.2.0",
+    "version" : "0.1.0",
     "type" : "package",
     "authors": [
         {
@@ -23,7 +23,7 @@
     "require": {
         "anibalealvarezs/projectbuilder-package": "1.2.3",
         "halfpetal/illuminate-onoi-cache": "^1.0",
-        "paladinsdev/php-api": "dev-master"
+        "paladinsdev/php-api": "1.1.5.1"
     },
     "autoload": {
         "psr-4": {
